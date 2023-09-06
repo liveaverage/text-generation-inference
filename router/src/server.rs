@@ -112,6 +112,31 @@ async fn health(mut health: Extension<Health>) -> Result<(), (StatusCode, Json<E
     }
 }
 
+// Duplicate health check for "/v2/health/ready"
+#[utoipa::path(
+    get,
+    tag = "Text Generation Inference",
+    path = "/v2/health/ready",
+    responses(
+        (status = 200, description = "Everything is working fine"),
+        (status = 503, description = "Text generation inference is down", body = ErrorResponse,
+         example = json ! ({"error": "unhealthy", "error_type": "healthcheck"})),
+    )
+)]
+#[instrument(skip(health_v2_ready))]
+async fn health_v2_ready(mut health: Extension<Health>) -> Result<(), (StatusCode, Json<ErrorResponse>)> {
+    match health.check().await {
+        true => Ok(()),
+        false => Err((
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(ErrorResponse {
+                error: "unhealthy".to_string(),
+                error_type: "healthcheck".to_string(),
+            }),
+        )),
+    }
+}
+
 /// Generate tokens
 #[utoipa::path(
 post,
