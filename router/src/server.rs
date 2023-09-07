@@ -123,7 +123,7 @@ async fn health(mut health: Extension<Health>) -> Result<(), (StatusCode, Json<E
          example = json ! ({"error": "unhealthy", "error_type": "healthcheck"})),
     )
 )]
-#[instrument(skip(health_v2_ready))]
+#[instrument(skip(health))]
 async fn health_v2_ready(mut health: Extension<Health>) -> Result<(), (StatusCode, Json<ErrorResponse>)> {
     match health.check().await {
         true => Ok(()),
