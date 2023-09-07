@@ -709,6 +709,8 @@ pub async fn run(
         .route("/invocations", post(compat_generate))
         // Base Health route
         .route("/health", get(health))
+        // Supplemental Health route
+        .route("/v2/health/ready", get(health))
         // Inference API health route
         .route("/", get(health))
         // AWS Sagemaker health route
@@ -751,6 +753,7 @@ pub async fn run(
                     .serve(
                         Router::new()
                             .route("/health", get(health))
+                            .route("/v2/health/ready", get(health))
                             .route("/metrics", get(metrics))
                             .layer(Extension(health_ext))
                             .layer(Extension(prom_handle))
